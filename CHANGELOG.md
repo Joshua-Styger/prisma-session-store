@@ -1,3 +1,9 @@
+## [3.2.0](https://github.com/kleydon/prisma-session-store/compare/v3.1.12...v3.1.13) (2024-03-29)
+
+### Implementations
+
+- Implemented the "dispose" option to be called when a session is removed from the database.
+
 ## [3.1.13](https://github.com/kleydon/prisma-session-store/compare/v3.1.12...v3.1.13) (2023-06-28)
 
 ### Bug Fixes

@@ -11,7 +11,7 @@
     "PASETO",
     "JWT"
   ],
-  "version": "3.1.13",
+  "version": "3.2.0",
   "license": "MIT",
   "author": "Krispin Leydon",
   "contributors": [
@@ -33,10 +33,11 @@
     "LICENSE"
   ],
   "scripts": {
+    "build": "tsc --build",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --project tsconfig.lib.json",
     "test": "jest --coverage",
     "prepare": "npx prisma generate && husky install",
-    "prepublish": "yarn build",
+    "prepublish": "pnpm build",
     "commit": "cz"
   },
   "engines": {
