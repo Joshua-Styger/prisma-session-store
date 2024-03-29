@@ -53,13 +53,14 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
    * );
    * ```
    */
-  constructor(
-    private readonly prisma: IPrisma<M>,
-    private readonly options: IOptions<M>
-  ) {
+  private readonly prisma!: IPrisma<M>;
+  private readonly options!: IOptions<M>;
+  constructor(prisma: IPrisma<M>, options: IOptions<M>) {
     super();
     this.startInterval();
     this.connect();
+    this.prisma = prisma;
+    this.options = options;
     this.isSetting = new Map<string, boolean>();
     this.isTouching = new Map<string, boolean>();
   }
@@ -107,6 +108,8 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
    * @description whether or not the prisma connection has been tested to be invalid
    */
   private invalidConnection = false;
+
+  private disposeFunction = this.options.dispose;
 
   /**
    * @description A object that handles logging to a given logger based on the logging level
@@ -394,6 +397,7 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
         this.logger.log(`Deleting session with sid: ${sid}`);
         const foundSession = await p.findUnique({ where: { sid } });
         if (foundSession !== null) await p.delete({ where: { sid } });
+        return this.disposeFunction;
       }
     }
   };

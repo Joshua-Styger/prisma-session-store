@@ -1,5 +1,5 @@
 {
-  "name": "@quixo3/prisma-session-store",
+  "name": "@galactic-squidge/prisma-session-store",
   "description": "Prisma express-session store",
   "keywords": [
     "Prisma",
@@ -15,14 +15,15 @@
   "license": "MIT",
   "author": "Krispin Leydon",
   "contributors": [
-    "wSedlacek"
+    "wSedlacek",
+    "Joshua Styger"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/kleydon/prisma-session-store.git"
+    "url": "https://github.com/Joshua-Styger/prisma-session-store.git"
   },
   "bugs": {
-    "url": "https://github.com/kleydon/prisma-session-store/issues"
+    "url": "https://github.com/Joshua-Styger/prisma-session-store/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +33,6 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.lib.json",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --project tsconfig.lib.json",
     "test": "jest --coverage",
     "prepare": "npx prisma generate && husky install",
