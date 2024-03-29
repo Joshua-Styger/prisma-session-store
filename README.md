@@ -18,7 +18,7 @@ Based on: [memorystore](https://github.com/roccomuso/memorystore), by [roccomuso
 ```js
 
 const expressSession = require('express-session');
-const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
+const { PrismaSessionStore } = require('@galactic-squidge/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
 ...
@@ -50,7 +50,7 @@ app.use(
 
 ```ts
 import expressSession from 'express-session';
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { PrismaSessionStore } from '@galactic-squidge/prisma-session-store';
 import  { PrismaClient } from '@prisma/client';
 ...
 
@@ -80,15 +80,15 @@ app.use(
 
 ### Install
 
-Install `@quixo3/prisma-session-store` (and `express-session`, if not already installed):
+Install `@galactic-squidge/prisma-session-store` (and `express-session`, if not already installed):
 
 #### NPM
 
-`$ npm install @quixo3/prisma-session-store express-session`
+`$ npm install @galactic-squidge/prisma-session-store express-session`
 
 #### yarn
 
-`$ yarn add @quixo3/prisma-session-store express-session`
+`$ yarn add @galactic-squidge/prisma-session-store express-session`
 
 ### Prisma
 
@@ -165,7 +165,7 @@ change your import and remove your call to the factory.
 Before
 
 ```js
-const PrismaSessionStore = require('@quixo3/prisma-session-store')(
+const PrismaSessionStore = require('@galactic-squidge/prisma-session-store')(
   expressSession
 );
 ```
@@ -173,7 +173,7 @@ const PrismaSessionStore = require('@quixo3/prisma-session-store')(
 After
 
 ```js
-const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
+const { PrismaSessionStore } = require('@galactic-squidge/prisma-session-store');
 ```
 
 ### TypeScript
@@ -181,7 +181,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 Before
 
 ```ts
-import prismaSessionStore from '@quixo3/prisma-session-store';
+import prismaSessionStore from '@galactic-squidge/prisma-session-store';
 
 const PrismaSessionStore = prismaSessionStore(expressSession);
 ```
@@ -189,7 +189,7 @@ const PrismaSessionStore = prismaSessionStore(expressSession);
 After
 
 ```ts
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { PrismaSessionStore } from '@galactic-squidge/prisma-session-store';
 ```
 
 ## Options
