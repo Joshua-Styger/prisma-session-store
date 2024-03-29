@@ -1,7 +1,7 @@
 # prisma-session-store
 
 > [!NOTE]  
-> This project is a fork of the [original](https://github.com/kleydon/prisma-session-store) with the sole purpose of implement the "dispose" option, which I leaned was either not implemented or removed from the codebase. It is otherwise completely untouched.
+> This project is a fork of the [original](https://github.com/kleydon/prisma-session-store) with the sole purpose of implementing the "dispose" option, which I leaned was either not implemented or removed from the codebase. It is otherwise completely untouched.
 
 An [express](https://github.com/expressjs) session store implementation for the [Prisma ORM](https://github.com/prisma).
 
