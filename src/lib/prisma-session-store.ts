@@ -53,120 +53,41 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
    * );
    * ```
    */
-  private readonly prisma!: IPrisma<M>;
-  private readonly options!: IOptions<M>;
-  constructor(prisma: IPrisma<M>, options: IOptions<M>) {
+  private readonly isTouching: Map<string, boolean>;
+  private readonly isSetting: Map<string, boolean>;
+  private checkInterval?: NodeJS.Timeout;
+  private readonly dbRecordIdIsSessionId = this.options.dbRecordIdIsSessionId;
+  private invalidConnection = false;
+  private readonly logger = new ManagedLogger(this.options.logger ?? console, this.options.loggerLevel ?? ['error']);
+  private readonly serializer = this.options.serializer ?? JSON;
+  private readonly sessionModelName: Exclude<M, `$${string}`> = this.options.sessionModelName ?? ('session' as Exclude<M, `$${string}`>);
+  private readonly dbRecordIdFunction = (sid: string) => this.options.dbRecordIdFunction?.(sid) ?? cuid2.createId();
+  private readonly disposeFunction: Function = this.options.dispose ?? (()=>null);
+
+  constructor(
+    private readonly prisma: IPrisma<M>,
+    private readonly options: IOptions<M>
+  ) {
     super();
     this.startInterval();
     this.connect();
-    this.prisma = prisma;
-    this.options = options;
     this.isSetting = new Map<string, boolean>();
     this.isTouching = new Map<string, boolean>();
   }
 
-  // Work-around, re: concurrrent calls to touch() and concurrent calls to set()
-  // having the same session id:
-  // Some users have experienced issues when concurrent calls are made
-  // to touch() or set(), using the same session id.
-  // This can occur, for instance, when a browser is loading
-  // a page with multiple resources in parallel.
-  // The issue may simply be an issue with SQLite
-  // (see https://stackoverflow.com/questions/4060772/sqlite-concurrent-access),
-  // but it hasn't yet been isolated. It is possible that express-session or prisma
-  // are alternately / additionally implicated.
-  //
-  // Until there is a long-term solution, this library offers a work-around,
-  // wherein only a single invocation of set() (or touch()) for a given session id
-  // may be executed at a time.
-  //
-  // If necessary, this workaround may be disabled by setting the following
-  // PrismaSessionStore options to true:
-  //   * enableConcurrentSetInvocationsForSameSessionID
-  //   * enableConcurrentTouchInvocationsForSameSessionID
-  //
-  // Use of the variables isTouching and isSetting (below)
-  // enables this work-around, and all references to these
-  // may be removed once the work-around is no longer needed.
-  private readonly isTouching: Map<string, boolean>;
-  private readonly isSetting: Map<string, boolean>;
-
-  /**
-   * @description The currently active interval created with `startInterval()` and removed with `stopInterval()`
-   */
-  private checkInterval?: NodeJS.Timeout;
-
-  /**
-   * @description A flag indicating to use the session ID as the Prisma Record ID
-   *
-   * Note: If undefined and dbRecordIdFunction is also undefined then a random
-   * CUID will be used instead.
-   */
-  private readonly dbRecordIdIsSessionId = this.options.dbRecordIdIsSessionId;
-
-  /**
-   * @description whether or not the prisma connection has been tested to be invalid
-   */
-  private invalidConnection = false;
-
-  private disposeFunction = this.options.dispose;
-
-  /**
-   * @description A object that handles logging to a given logger based on the logging level
-   */
-  private readonly logger = new ManagedLogger(
-    this.options.logger ?? console,
-    this.options.loggerLevel ?? ['error']
-  );
-
-  /**
-   * @description Some serializer that will transform objects into strings
-   * and vice versa
-   */
-  private readonly serializer = this.options.serializer ?? JSON;
-
-  /**
-   * @description The name of the sessions model
-   *
-   * Defaults to `session` if `sessionModelName` in options is undefined
-   */
-  private readonly sessionModelName: Exclude<M, `$${string}`> =
-    this.options.sessionModelName ?? ('session' as Exclude<M, `$${string}`>);
-
-  /**
-   * Attempts to connect to Prisma, displaying a pretty error if the connection is not possible.
-   */
   private async connect(): Promise<void> {
     await this.prisma?.$connect?.();
     await this.validateConnection();
   }
 
-  /**
-   * @description A function to generate the Prisma Record ID for a given session ID
-   *
-   * Note: If undefined and dbRecordIdIsSessionId is also undefined then a random
-   * CUID will be used instead.
-   */
-  private readonly dbRecordIdFunction = (sid: string) =>
-    this.options.dbRecordIdFunction?.(sid) ?? cuid2.createId();
-
-  /**
-   * Disables store, used when prisma cannot be connected to
-   */
   private disable(): void {
     this.invalidConnection = true;
   }
 
-  /**
-   * Enables store, used when prisma can be connected to
-   */
   private enable(): void {
     this.invalidConnection = false;
   }
 
-  /**
-   * Returns if the connect is valid or not, logging an error if it is not.
-   */
   private async validateConnection(): Promise<boolean> {
     await (
       this.prisma?.$connect?.() ??
@@ -186,7 +107,6 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
 
     return !this.invalidConnection;
   }
-
   /**
    * Fetch all sessions
    *
@@ -397,7 +317,7 @@ export class PrismaSessionStore<M extends string = 'session'> extends Store {
         this.logger.log(`Deleting session with sid: ${sid}`);
         const foundSession = await p.findUnique({ where: { sid } });
         if (foundSession !== null) await p.delete({ where: { sid } });
-        return this.disposeFunction;
+        return this.disposeFunction(foundSession);
       }
     }
   };
